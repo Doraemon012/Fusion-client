@@ -18,18 +18,32 @@ function AddPlacementEventForm() {
   const [role, setRole] = useState("");
   const [datePickerOpened, setDatePickerOpened] = useState(false); // State to manage date picker visibility
 
-  const handleSubmit = () => {
-    console.log({
-      company,
-      date,
-      location,
-      ctc,
-      time,
-      placementType,
-      description,
-      role,
-    });
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("placement_type", placementType);
+    formData.append("company_name", company);
+    formData.append("ctc", ctc);
+    formData.append("description", description);
+    formData.append("time_stamp", time);
+    formData.append("title", company);
+    formData.append("location", location);
+    formData.append("role", role);
+    formData.append("resume", resumeFile);
+    formData.append("schedule_at", time);
+    formData.append("placement_date", date.toISOString().split("T")[0]);
+  
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/placement/api/placement/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data.message);
+    } catch (error) {
+      console.error("Error adding schedule:", error.response.data.error);
+    }
   };
+  
 
   return (
     <Card shadow="md" padding="lg" radius="md" withBorder style={{ maxWidth: '800px', margin: '0 auto' }}>
