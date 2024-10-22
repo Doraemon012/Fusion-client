@@ -1,373 +1,103 @@
-/* eslint-disable import/order */
-/* eslint-disable react/function-component-definition */
-/* eslint-disable no-plusplus */
-/* eslint-disable react/prop-types */
-import React, { useState } from "react";
-import PlacementScheduleCard from "./PlacementScheduleCard";
-import { Container, Pagination, Grid } from "@mantine/core";
+import React from "react";
+import { Card, Text, Badge, Group, Button, Image } from "@mantine/core";
+import { Clock, MapPin } from "@phosphor-icons/react";
+import { useNavigate } from "react-router-dom";
 
-const placementData = [
-  {
-    id: 1,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 2,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-    companyName: "Microsoft",
-    location: "Redmond, WA, USA",
-    position: "Data Scientist",
-    jobType: "Full Time",
-    postedTime: "2 hours ago",
-    deadline: "October 25, 2024, 11:59pm",
-    description:
-      "Analyze large datasets and build predictive models to support business decisions...",
-    salary: "$110,000/year",
-  },
-  {
-    id: 3,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/375px-Google_2015_logo.svg.png",
-    companyName: "Google",
-    location: "Mountain View, CA, USA",
-    position: "Product Manager",
-    jobType: "Contract",
-    postedTime: "1 day ago",
-    deadline: "November 1, 2024, 11:59pm",
-    description:
-      "Manage product life cycles and coordinate with cross-functional teams to deliver projects...",
-    salary: "$80,000/year",
-  },
-  {
-    id: 4,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/135px-Apple_logo_black.svg.png",
-    companyName: "Apple",
-    location: "Cupertino, CA, USA",
-    position: "Hardware Engineer",
-    jobType: "Full Time",
-    postedTime: "3 days ago",
-    deadline: "November 10, 2024, 11:59pm",
-    description:
-      "Design and develop innovative hardware solutions for our cutting-edge products...",
-    salary: "$130,000/year",
-  },
-  {
-    id: 5,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 6,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 7,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 8,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 9,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 10,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 11,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 12,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 13,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-    companyName: "Microsoft",
-    location: "Redmond, WA, USA",
-    position: "Data Scientist",
-    jobType: "Full Time",
-    postedTime: "2 hours ago",
-    deadline: "October 25, 2024, 11:59pm",
-    description:
-      "Analyze large datasets and build predictive models to support business decisions...",
-    salary: "$110,000/year",
-  },
-  {
-    id: 14,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/375px-Google_2015_logo.svg.png",
-    companyName: "Google",
-    location: "Mountain View, CA, USA",
-    position: "Product Manager",
-    jobType: "Contract",
-    postedTime: "1 day ago",
-    deadline: "November 1, 2024, 11:59pm",
-    description:
-      "Manage product life cycles and coordinate with cross-functional teams to deliver projects...",
-    salary: "$80,000/year",
-  },
-  {
-    id: 15,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/e/e3/Apple_logo_black.svg",
-    companyName: "Apple",
-    location: "Cupertino, CA, USA",
-    position: "Hardware Engineer",
-    jobType: "Full Time",
-    postedTime: "3 days ago",
-    deadline: "November 10, 2024, 11:59pm",
-    description:
-      "Design and develop innovative hardware solutions for our cutting-edge products...",
-    salary: "$130,000/year",
-  },
-  {
-    id: 16,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 17,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 18,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 19,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 20,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 21,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-  {
-    id: 22,
-    companyLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-    companyName: "Amazon",
-    location: "Seattle, WA, USA",
-    position: "Software Engineer",
-    jobType: "Full Time",
-    postedTime: "5 min ago",
-    deadline: "October 20, 2024, 11:59pm",
-    description:
-      "Participate in a coding challenge where you solve real-world problems using algorithms...",
-    salary: "$120,000/year",
-  },
-];
+function PlacementScheduleCard({
+  companyLogo,
+  companyName,
+  location,
+  position,
+  jobType,
+  postedTime,
+  deadline,
+  description,
+  salary,
+}) {
+  const navigate = useNavigate();
 
-// eslint-disable-next-line react/function-component-definition
-const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow }) => {
-  const [activePage, setActivePage] = useState(1);
-
-  const startIndex = (activePage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = data.slice(startIndex, endIndex);
-
-  // Calculate number of rows
-  const totalRows = Math.ceil(currentItems.length / cardsPerRow);
-  const paddedItems = [...currentItems];
-
-  // Add placeholder cards if the last row is incomplete
-  const remainingCards = totalRows * cardsPerRow - currentItems.length;
-  for (let i = 0; i < remainingCards; i++) {
-    paddedItems.push(null);
-  }
+  const handleApplyClick = () => {
+    navigate(
+      `/placement-cell/apply?companyName=${encodeURIComponent(companyName)}&companyLogo=${encodeURIComponent(companyLogo)}`,
+    );
+  };
 
   return (
-    <Container fluid py={32}>
-      <Grid gutter="md">
-        {paddedItems.map((item, index) => (
-          <Grid.Col key={index} span={12 / cardsPerRow}>
-            <PlacementScheduleCard
-              companyLogo={item.companyLogo}
-              companyName={item.companyName}
-              location={item.location}
-              position={item.position}
-              jobType={item.jobType}
-              postedTime={item.postedTime}
-              deadline={item.deadline}
-              description={item.description}
-              salary={item.salary}
-            />
-          </Grid.Col>
-        ))}
-      </Grid>
-
-      <Pagination
-        page={activePage}
-        onChange={setActivePage}
-        total={Math.ceil(data.length / itemsPerPage)}
-        mt="xl"
-        position="right"
-      />
-    </Container>
+    <Card
+      shadow="sm"
+      padding="lg"
+      radius="lg"
+      withBorder
+      style={{ maxWidth: 400, position: "relative" }}
+    >
+      {/* Deadline on top right */}
+      <Text
+        size="xs"
+        color="dimmed"
+        align="right"
+        style={{ position: "absolute", top: "10px", right: "10px" }}
+      >
+        Deadline: <br /> {deadline}
+      </Text>
+      {/* Logo and Company Information */}
+      <Group align="flex-start">
+        <Image
+          src={companyLogo}
+          alt={`${companyName} logo`}
+          width={40}
+          height={40}
+          fit="contain"
+          withPlaceholder
+        />
+      </Group>
+      <Text weight={700} size="lg" mt={10}>
+        {companyName}
+      </Text>
+      <Group spacing={5} mt={5}>
+        <MapPin size={16} />
+        <Text size="sm" color="dimmed">
+          {location}
+        </Text>
+      </Group>
+      <Text weight={500} size="md" mt="sm">
+        {position}
+      </Text>
+      <Group mt="xs" spacing="xs">
+        <Badge color="green">{jobType}</Badge>
+        <Group spacing={5}>
+          <Clock size={16} />
+          <Text size="xs" color="dimmed">
+            {postedTime}
+          </Text>
+        </Group>
+      </Group>
+      <Text
+        size="sm"
+        mt="sm"
+        color="dimmed"
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {description}
+      </Text>
+      <Group position="apart" mt="md">
+        <Text size="xl" weight={700} color="blue">
+          {salary}
+        </Text>
+        <Button
+          variant="light"
+          color="blue"
+          size="xs"
+          onClick={handleApplyClick}
+        >
+          Apply Now
+        </Button>
+      </Group>
+    </Card>
   );
-};
+}
 
-const PlacementSchedule = () => {
-  return <PlacementScheduleGrid data={placementData} itemsPerPage={6} />;
-};
-
-export default PlacementSchedule;
+export default PlacementScheduleCard;
