@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import PlacementScheduleCard from './PlacementScheduleCard';
 import { Container, Pagination, Grid} from '@mantine/core';
@@ -13,7 +14,7 @@ const getCookie = (name) => {
   if (parts.length === 2) return parts.pop().split(';').shift();
 };
 
-// Usage
+
 const csrfToken = getCookie('csrftoken');
 
 const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) => {
@@ -28,6 +29,7 @@ const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) 
   const paddedItems = [...currentItems];
 
   const remainingCards = totalRows * cardsPerRow - currentItems.length;
+  
   for (let i = 0; i < remainingCards; i++) {
     paddedItems.push(null);
   }
@@ -75,6 +77,7 @@ const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) 
 };
 
 const PlacementSchedule = () => {
+
   const [placementData, setPlacementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
