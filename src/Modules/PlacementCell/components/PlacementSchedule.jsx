@@ -47,6 +47,7 @@ const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) 
           <Grid.Col key={index} span={12 / cardsPerRow}>
             {item ? (
             <PlacementScheduleCard
+                jobId={item.id}
                 companyLogo="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                 companyName={item.company_name}
                 location={item.location}

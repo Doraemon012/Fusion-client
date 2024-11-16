@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { TextInput, Button, Group, Select, Textarea, Card, Title, Grid, ActionIcon } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import { Calendar } from "@phosphor-icons/react";
-import axios from "axios"; // Make sure axios is imported
+import axios from "axios";
 import { useSelector } from "react-redux";
-
 import { notifications } from "@mantine/notifications";
-
 
 function AddPlacementEventForm() {
   const role = useSelector((state) => state.user.role);
@@ -18,23 +16,33 @@ function AddPlacementEventForm() {
   const [placementType, setPlacementType] = useState("");
   const [description, setDescription] = useState("");
   const [jobrole, setRole] = useState("");
-  // const [role, setRole] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [datePickerOpened, setDatePickerOpened] = useState(false);
 
   // Function to get the current time in HH:mm:ss format
   const getCurrentTime = () => {
     const now = new Date();
-    return now.toLocaleTimeString('en-GB', { hour12: false });
+    return now.toLocaleTimeString("en-GB", { hour12: false });
   };
 
   // Set the default time to the current time
   useEffect(() => {
     setTime(getCurrentTime());
-  }, []); // Empty dependency array to ensure it runs only once on component mount
+  }, []);
 
   const handleSubmit = async () => {
     console.log("Submitting form"); // Debugging log
+
+    const token = localStorage.getItem("authToken"); // Retrieve token from localStorage
+    if (!token) {
+      notifications.show({
+        title: "Unauthorized",
+        message: "You must log in to perform this action.",
+        color: "red",
+        position: "top-center",
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append("placement_type", placementType);
@@ -45,12 +53,10 @@ function AddPlacementEventForm() {
     formData.append("location", location);
     formData.append("role", role);
 
-    // Append resume file if it exists
     if (resumeFile) {
       formData.append("resume", resumeFile);
     }
 
-    // Always use either the default or user-provided time
     formData.append("schedule_at", time);
 
     if (date) {
@@ -61,38 +67,36 @@ function AddPlacementEventForm() {
       const response = await axios.post("http://127.0.0.1:8000/placement/api/placement/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Token ${token}`, 
         },
       });
-      console.log(response.data.message);
-      // notification that the schedule has been added
-      alert("Placement Event has been added successfully");
+      alert(response.data.message);
+      // Notification for success
       notifications.show({
         title: "Event Added",
-        message: "Placement Event has been added successfully",
+        message: "Placement Event has been added successfully.",
         color: "green",
         position: "top-center",
       });
     } catch (error) {
+      const errorMessage = error.response?.data?.error || error.message;
       notifications.show({
         title: "Error",
-        message: "Failed to add Placement Event",
+        message: `Failed to add Placement Event: ${errorMessage}`,
         color: "red",
         position: "top-center",
       });
-      console.error("Error adding schedule:", error.response?.data?.error || error.message);
+      console.error("Error adding schedule:", errorMessage);
     }
   };
-  
-
 
   return (
-    <Card shadow="md" padding="lg" radius="md" withBorder style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <Card shadow="md" padding="lg" radius="md" withBorder style={{ maxWidth: "800px", margin: "0 auto" }}>
       <Title order={3} align="center" style={{ marginBottom: "20px" }}>
         Add Placement Event
       </Title>
 
       <Grid gutter="lg">
-        {/* First row: Company Name, Date, Location */}
         <Grid.Col span={4}>
           <TextInput
             label="Company Name"
@@ -108,9 +112,7 @@ function AddPlacementEventForm() {
             value={date ? date.toLocaleDateString() : ""}
             readOnly
             rightSection={
-              <ActionIcon
-                onClick={() => setDatePickerOpened((prev) => !prev)}
-              >
+              <ActionIcon onClick={() => setDatePickerOpened((prev) => !prev)}>
                 <Calendar size={16} />
               </ActionIcon>
             }
@@ -136,7 +138,6 @@ function AddPlacementEventForm() {
           />
         </Grid.Col>
 
-        {/* Second row: CTC, Time, Placement Type */}
         <Grid.Col span={4}>
           <TextInput
             label="CTC In Lpa"
@@ -150,7 +151,7 @@ function AddPlacementEventForm() {
             label="Time"
             placeholder="Select time"
             value={time}
-            onChange={(value) => setTime(value.toLocaleTimeString('en-GB', { hour12: false }))}
+            onChange={(value) => setTime(value.toLocaleTimeString("en-GB", { hour12: false }))}
             format="24"
           />
         </Grid.Col>
@@ -164,7 +165,6 @@ function AddPlacementEventForm() {
           />
         </Grid.Col>
 
-        {/* Third row: Description */}
         <Grid.Col span={12}>
           <Textarea
             label="Description"
@@ -175,7 +175,6 @@ function AddPlacementEventForm() {
           />
         </Grid.Col>
 
-        {/* Fourth row: Role Offered */}
         <Grid.Col span={12}>
           <TextInput
             label="Role Offered"
@@ -185,7 +184,6 @@ function AddPlacementEventForm() {
           />
         </Grid.Col>
 
-        {/* Fifth row: Resume */}
         {role === "student" && (
           <Grid.Col span={12}>
             <TextInput
@@ -195,10 +193,8 @@ function AddPlacementEventForm() {
             />
           </Grid.Col>
         )}
-
       </Grid>
 
-      {/* Submit button */}
       <Group position="right" style={{ marginTop: "20px" }}>
         <Button onClick={handleSubmit}>Add Event</Button>
       </Group>
