@@ -41,6 +41,18 @@ function PlacementScheduleCard({
   const role = useSelector((state) => state.user.role);
   const [visible, setVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [company, setCompany] = useState(companyName);
+  const [date, setDate] = useState(null);
+  const [datePickerOpened, setDatePickerOpened] = useState(false);
+  const [locationInput, setLocation] = useState(location);
+  const [ctc, setCtc] = useState("");
+  const [time, setTime] = useState("");
+  const [placementType, setPlacementType] = useState("");
+  const [jobRole, setRole] = useState(position);
+  const [descriptionInput, setDescription] = useState(description);
+
+
   const navigate = useNavigate();
 
   const handleApplyClick = async () => {
@@ -64,16 +76,6 @@ function PlacementScheduleCard({
     } catch (error) {
       console.error('Error:', error);
     }
-  const [company, setCompany] = useState(companyName);
-  const [date, setDate] = useState(null);
-  const [datePickerOpened, setDatePickerOpened] = useState(false);
-  const [locationInput, setLocation] = useState(location);
-  const [ctc, setCtc] = useState("");
-  const [time, setTime] = useState("");
-  const [placementType, setPlacementType] = useState("");
-  const [jobRole, setRole] = useState(position);
-  const [descriptionInput, setDescription] = useState(description);
-
 
   };
 
@@ -101,64 +103,60 @@ function PlacementScheduleCard({
 
   return (
     <>
-      <Card
-        shadow="sm"
-        padding="lg"
-        radius="lg"
-        withBorder
-        style={{ maxWidth: 400, position: "relative" }}
+    <Card
+      shadow="sm"
+      padding="lg"
+      radius="lg"
+      withBorder
+      style={{ width: 320, position: "relative" }}
+    >
+      <Group align="flex-start">
+        <Image
+          src={companyLogo}
+          alt={`${companyName} logo`}
+          width={40}
+          height={40}
+          fit="contain"
+          withPlaceholder
+        />
+      </Group>
+      <Text weight={700} size="lg" mt={10}>
+        {companyName}
+      </Text>
+      <Group spacing={5} mt={5}>
+        <MapPin size={16} />
+        <Text size="sm" color="dimmed">
+          {location}
+        </Text>
+      </Group>
+      <Text weight={500} size="md" mt="sm">
+        {position}
+      </Text>
+      <Group mt="xs" spacing="xs">
+        <Badge color="green">{jobType}</Badge>
+        <Group spacing={5}>
+          <Clock size={16} />
+          <Text size="xs" color="dimmed">
+            {postedTime}
+          </Text>
+        </Group>
+      </Group>
+      <Text
+        size="sm"
+        mt="sm"
+        color="dimmed"
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
       >
-        <Group align="flex-start">
-          <Image
-            src={companyLogo}
-            alt={`${companyName} logo`}
-            width={40}
-            height={40}
-            fit="contain"
-            withPlaceholder
-          />
-        </Group>
-        <Text weight={700} size="lg" mt={10}>
-          {companyName}
+        {description}
+      </Text>
+      <Group position="apart" mt="md" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Text size="xl" weight={700} color="blue">
+          {salary}
         </Text>
-        <Group spacing={5} mt={5}>
-          <MapPin size={16} />
-          <Text size="sm" color="dimmed">
-            {location}
-          </Text>
-        </Group>
-        <Text weight={500} size="md" mt="sm">
-          {position}
-        </Text>
-        <Group mt="xs" spacing="xs">
-          <Badge color="green">{jobType}</Badge>
-          <Group spacing={5}>
-            <Clock size={16} />
-            <Text size="xs" color="dimmed">
-              {postedTime}
-            </Text>
-          </Group>
-        </Group>
-        <Text
-          size="sm"
-          mt="sm"
-          color="dimmed"
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {description}
-        </Text>
-        <Group
-          position="apart"
-          mt="md"
-          style={{ display: "flex", justifyContent: "space-between" }}
-        >
-          <Text size="xl" weight={700} color="blue">
-            {salary}
-          </Text>
 
           {role === "student" && (
             <Button
@@ -204,7 +202,6 @@ function PlacementScheduleCard({
         </Group>
       </Card>
 
-      {/* Modal for editing form */}
       <Modal
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
