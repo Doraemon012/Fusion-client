@@ -1,7 +1,7 @@
-import React from "react";
-import { Text, Tabs } from "@mantine/core";
-// import AddPlacementRecordForm from "./components/AddPlacementRecordForm";
+import React, { useState, useRef } from "react";
+import { Tabs, Button } from "@mantine/core";
 import { useSelector } from "react-redux";
+import { CaretCircleLeft, CaretCircleRight } from "@phosphor-icons/react";
 import AddPlacementEventForm from "./components/AddPlacementEventForm";
 import PlacementRecordsTable from "./components/PlacementRecordsTable";
 import PlacementCalendar from "./components/PlacementCalendar";
@@ -62,7 +62,6 @@ const tpoTabs = [
     label: "Placement Stats",
     component: <PlacementRecordsTable />,
   },
-  // { value: "add-record", label: "Add Placement Record", component: <AddPlacementRecordForm /> },
   {
     value: "placement-calendar",
     label: "Placement Calendar",
@@ -75,8 +74,67 @@ const tpoTabs = [
   },
 ];
 
+const styles = {
+  container: {
+    padding: "20px",
+  },
+  navContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  tabsContainer: {
+    display: "flex",
+    flexWrap: "nowrap",
+    overflowX: "auto",
+    scrollbarWidth: "none", // Hides scrollbar in Firefox
+    msOverflowStyle: "none", // Hides scrollbar in Internet Explorer
+    marginLeft: "10px", // Reduced distance between the left arrow and the tabs
+  },
+  tabsList: {
+    display: "flex",
+    gap: "0px", // No gap between tabs
+  },
+  navButton: {
+    border: "none",
+    backgroundColor: "#f5f5f5",
+    cursor: "pointer",
+    fontSize: "1.75rem",
+    padding: "8px",
+    width: "50px",
+    height: "50px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: "50%",
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+
+  fusionCaretCircleIcon: {
+    fontSize: "2rem",
+  },
+
+  tab: {
+    fontWeight: "normal",
+    color: "#6c757d",
+    padding: "10px 20px",
+    cursor: "pointer", // Ensures tabs are clickable
+  },
+  activeTab: {
+    backgroundColor: "#15abff10", // Light blue background for active tab
+    color: "#15abff",
+    // fontWeight: "bold",
+    borderRadius: "4px",
+  },
+  tabContent: {
+    marginTop: "20px",
+  },
+};
+
 function PlacementCellPage() {
   const role = useSelector((state) => state.user.role);
+  const [activeTab, setActiveTab] = useState("schedule");
+  const tabsContainerRef = useRef(null);
 
   const tabs =
     role === "student"
@@ -86,25 +144,94 @@ function PlacementCellPage() {
         : role === "placement officer"
           ? tpoTabs
           : [];
-  // const tabs = role ==="placement officer" ? tpoTabs:[];
+
+  const handleTabChange = (direction) => {
+    const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
+    const newIndex =
+      direction === "prev"
+        ? Math.max(currentIndex - 1, 0)
+        : Math.min(currentIndex + 1, tabs.length - 1);
+
+    setActiveTab(tabs[newIndex].value);
+
+    tabsContainerRef.current.scrollBy({
+      left: direction === "next" ? 100 : -100,
+      behavior: "smooth",
+    });
+  };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Tabs defaultValue="schedule" variant="outline">
-        <Tabs.List>
-          {tabs.map((tab) => (
-            <Tabs.Tab key={tab.value} value={tab.value}>
-              {tab.label}
-            </Tabs.Tab>
-          ))}
-        </Tabs.List>
+    <div style={styles.container}>
+      <div style={styles.navContainer}>
+        {/* Left navigation button */}
+        <Button
+          onClick={() => handleTabChange("prev")}
+          variant="default"
+          p={0}
+          style={{ border: "none" }}
+        >
+          <CaretCircleLeft
+            style={styles.fusionCaretCircleIcon}
+            weight="light"
+          />
+        </Button>
 
-        {tabs.map((tab) => (
-          <Tabs.Panel key={tab.value} value={tab.value}>
-            {tab.component || <Text>No content available.</Text>}
-          </Tabs.Panel>
-        ))}
-      </Tabs>
+        {/* Tabs list */}
+        <div
+          className="fusionTabsContainer"
+          style={styles.tabsContainer}
+          ref={tabsContainerRef}
+        >
+          <Tabs value={activeTab} onTabChange={setActiveTab}>
+            <Tabs.List style={styles.tabsList}>
+              {tabs.map((tab) => (
+                <Tabs.Tab
+                  key={tab.value}
+                  value={tab.value}
+                  style={{
+                    ...styles.tab,
+                    ...(activeTab === tab.value && styles.activeTab),
+                  }}
+                  onClick={() => setActiveTab(tab.value)}
+                >
+                  {tab.label}
+                </Tabs.Tab>
+              ))}
+            </Tabs.List>
+          </Tabs>
+        </div>
+
+        {/* Right navigation button */}
+        {/* <button
+          className="fusionCaretCircleIcon"
+          style={styles.navButton}
+          onClick={() => handleTabChange("next")}
+          aria-label="Next tab"
+        >
+          {">"}
+        </button> */}
+
+        <Button
+          onClick={() => handleTabChange("next")}
+          variant="default"
+          p={0}
+          style={{ border: "none" }}
+        >
+          <CaretCircleRight
+            style={styles.fusionCaretCircleIcon}
+            weight="light"
+          />
+        </Button>
+      </div>
+
+      {/* Tab content */}
+      <div style={styles.tabContent}>
+        {tabs.map((tab) =>
+          tab.value === activeTab ? (
+            <div key={tab.value}>{tab.component}</div>
+          ) : null,
+        )}
+      </div>
     </div>
   );
 }
