@@ -143,7 +143,6 @@ function PlacementSchedule() {
       <PlacementScheduleGrid
         data={placementData}
         itemsPerPage={6}
-        cardsPerRow={3}
         onAddEvent={handleAddEvent}
       />
       <Modal
