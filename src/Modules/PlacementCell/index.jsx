@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { Tabs, Button } from "@mantine/core";
 import { useSelector } from "react-redux";
 import { CaretCircleLeft, CaretCircleRight } from "@phosphor-icons/react";
-import AddPlacementEventForm from "./components/AddPlacementEventForm";
 import PlacementRecordsTable from "./components/PlacementRecordsTable";
 import PlacementCalendar from "./components/PlacementCalendar";
 import PlacementSchedule from "./components/PlacementSchedule";
@@ -66,11 +65,6 @@ const tpoTabs = [
     value: "placement-calendar",
     label: "Placement Calendar",
     component: <PlacementCalendar />,
-  },
-  {
-    value: "add-event",
-    label: "Add Placement Event",
-    component: <AddPlacementEventForm />,
   },
 ];
 
@@ -145,21 +139,6 @@ function PlacementCellPage() {
           ? tpoTabs
           : [];
 
-  const handleTabChange = (direction) => {
-    const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
-    const newIndex =
-      direction === "prev"
-        ? Math.max(currentIndex - 1, 0)
-        : Math.min(currentIndex + 1, tabs.length - 1);
-
-    setActiveTab(tabs[newIndex].value);
-
-    tabsContainerRef.current.scrollBy({
-      left: direction === "next" ? 100 : -100,
-      behavior: "smooth",
-    });
-  };
-
   return (
     <div style={styles.container}>
       <div style={styles.navContainer}>
@@ -202,15 +181,6 @@ function PlacementCellPage() {
         </div>
 
         {/* Right navigation button */}
-        {/* <button
-          className="fusionCaretCircleIcon"
-          style={styles.navButton}
-          onClick={() => handleTabChange("next")}
-          aria-label="Next tab"
-        >
-          {">"}
-        </button> */}
-
         <Button
           onClick={() => handleTabChange("next")}
           variant="default"

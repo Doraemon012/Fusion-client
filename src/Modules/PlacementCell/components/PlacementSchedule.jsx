@@ -37,14 +37,25 @@ function PlacementScheduleGrid({
   Array.from({ length: remainingCards }).forEach(() => paddedItems.push(null));
 
   return (
-    <Container fluid py={32}>
-      {/* Add button for placement officers */}
-      {role === "placement officer" && (
-        <Button onClick={onAddEvent} variant="outline" mb="md">
-          Add Placement Event
-        </Button>
-      )}
-      <Grid gutter="md">
+    <Container fluid py={16}>
+      <Container
+        fluid
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        my={16}
+      >
+        <Title order={2}>Placement Events</Title>
+        {role === "placement officer" && (
+          <Button onClick={onAddEvent} variant="outline">
+            Add Placement Event
+          </Button>
+        )}
+      </Container>
+      <Grid gutter="xl">
         {paddedItems.map((item, index) => (
           <Grid.Col key={index} span={12 / cardsPerRow}>
             {item ? (
@@ -158,6 +169,6 @@ function PlacementSchedule() {
       </Modal>
     </>
   );
-}
+};
 
 export default PlacementSchedule;
