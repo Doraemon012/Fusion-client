@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { TextInput, Button, Group, Select, Textarea, Card, Title, Grid, ActionIcon } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Select,
+  Textarea,
+  Card,
+  Title,
+  Grid,
+  ActionIcon,
+} from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import { Calendar } from "@phosphor-icons/react";
 import axios from "axios";
@@ -86,12 +96,15 @@ function AddPlacementEventForm() {
         color: "red",
         position: "top-center",
       });
-      console.error("Error adding schedule:", errorMessage);
+      console.error(
+        "Error adding schedule:",
+        error.response?.data?.error || error.message,
+      );
     }
   };
 
   return (
-    <Card shadow="md" padding="lg" radius="md" withBorder style={{ maxWidth: "800px", margin: "0 auto" }}>
+    <Card style={{ maxWidth: "800px", margin: "0 auto" }}>
       <Title order={3} align="center" style={{ marginBottom: "20px" }}>
         Add Placement Event
       </Title>
@@ -151,7 +164,9 @@ function AddPlacementEventForm() {
             label="Time"
             placeholder="Select time"
             value={time}
-            onChange={(value) => setTime(value.toLocaleTimeString("en-GB", { hour12: false }))}
+            onChange={(value) =>
+              setTime(value.toLocaleTimeString("en-GB", { hour12: false }))
+            }
             format="24"
           />
         </Grid.Col>

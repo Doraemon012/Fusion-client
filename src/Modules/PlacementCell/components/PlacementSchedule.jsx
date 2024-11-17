@@ -1,23 +1,26 @@
-
-import React, { useState, useEffect } from 'react';
-import PlacementScheduleCard from './PlacementScheduleCard';
-import { Container, Pagination, Grid} from '@mantine/core';
-import axios from 'axios';
-import { Modal } from '@mantine/core';
-import AddPlacementEventForm from './AddPlacementEventForm'; 
-import { useSelector } from 'react-redux';
-import { Button } from '@mantine/core';
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { Container, Pagination, Grid, Modal, Button, Title } from "@mantine/core";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import AddPlacementEventForm from "./AddPlacementEventForm";
+import PlacementScheduleCard from "./PlacementScheduleCard";
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  if (parts.length === 2) return parts.pop().split(";").shift();
 };
 
+const csrfToken = getCookie("csrftoken");
 
-const csrfToken = getCookie('csrftoken');
-
-const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) => {
+// PlacementScheduleGrid component
+function PlacementScheduleGrid({
+  data,
+  itemsPerPage,
+  cardsPerRow,
+  onAddEvent,
+}) {
   const role = useSelector((state) => state.user.role);
   const [activePage, setActivePage] = useState(1);
 
@@ -29,20 +32,29 @@ const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) 
   const paddedItems = [...currentItems];
 
   const remainingCards = totalRows * cardsPerRow - currentItems.length;
-  
-  for (let i = 0; i < remainingCards; i++) {
-    paddedItems.push(null);
-  }
+
+  Array.from({ length: remainingCards }).forEach(() => paddedItems.push(null));
 
   return (
-    <Container fluid py={32}>
-      {/* Add button for placement officers */}
-      {role === 'placement officer' && (
-        <Button onClick={onAddEvent} variant="outline" mb="md">
-          Add Placement Event
-        </Button>
-      )}
-      <Grid gutter="md">
+    <Container fluid py={16}>
+      <Container
+        fluid
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        my={16}
+      >
+        <Title order={2}>Placement Events</Title>
+        {role === "placement officer" && (
+          <Button onClick={onAddEvent} variant="outline">
+            Add Placement Event
+          </Button>
+        )}
+      </Container>
+      <Grid gutter="xl">
         {paddedItems.map((item, index) => (
           <Grid.Col key={index} span={12 / cardsPerRow}>
             {item ? (
@@ -51,15 +63,15 @@ const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) 
                 companyLogo="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                 companyName={item.company_name}
                 location={item.location}
-                position={item.role}
+                position={String(item.role)}
                 jobType={item.placement_type}
                 postedTime={item.schedule_at}
                 deadline={item.placement_date}
                 description={item.description}
                 salary={item.ctc}
               />
-              ) : (
-              <div style={{ height: '100%', border: '1px dashed gray' }}>
+            ) : (
+              <div style={{ height: "100%", border: "1px dashed gray" }}>
                 Placeholder
               </div>
             )}
@@ -75,10 +87,29 @@ const PlacementScheduleGrid = ({ data, itemsPerPage, cardsPerRow, onAddEvent }) 
       />
     </Container>
   );
+}
+
+// Prop Types for PlacementScheduleGrid
+PlacementScheduleGrid.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      company_name: PropTypes.string.isRequired,
+      location: PropTypes.string.isRequired,
+      role: PropTypes.string.isRequired,
+      placement_type: PropTypes.string.isRequired,
+      schedule_at: PropTypes.string.isRequired,
+      placement_date: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      ctc: PropTypes.number,
+    }),
+  ).isRequired,
+  itemsPerPage: PropTypes.number.isRequired,
+  cardsPerRow: PropTypes.number.isRequired,
+  onAddEvent: PropTypes.func.isRequired,
 };
 
-const PlacementSchedule = () => {
-
+// PlacementSchedule component
+function PlacementSchedule() {
   const [placementData, setPlacementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,15 +118,21 @@ const PlacementSchedule = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/placement/api/placement/', {
-          headers: {
-            'X-CSRFToken': csrfToken,
-            'Content-Type': 'application/json',
+        const response = await axios.get(
+          "http://127.0.0.1:8000/placement/api/placement/",
+          {
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
         setPlacementData(response.data);
       } catch (err) {
-        console.error('Error details:', err.response ? err.response.data : err.message);
+        console.error(
+          "Error details:",
+          err.response ? err.response.data : err.message,
+        );
         setError(err.message);
       } finally {
         setLoading(false);
@@ -114,18 +151,24 @@ const PlacementSchedule = () => {
 
   return (
     <>
-      <PlacementScheduleGrid data={placementData} itemsPerPage={6} onAddEvent={handleAddEvent} />
+      <PlacementScheduleGrid
+        data={placementData}
+        itemsPerPage={6}
+        onAddEvent={handleAddEvent}
+      />
       <Modal
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add Placement Event"
         size="lg"
         centered
       >
-        <AddPlacementEventForm opened={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <AddPlacementEventForm
+          opened={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </Modal>
     </>
   );
-}
+};
 
 export default PlacementSchedule;
