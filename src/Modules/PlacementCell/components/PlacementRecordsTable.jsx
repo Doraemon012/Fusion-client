@@ -11,14 +11,13 @@ import {
   Loader,
   Alert,
 } from "@mantine/core";
-import { statisticsRoute } from "../../../routes/placementCellRoutes"; // Ensure this points to your actual API route
+import { statisticsRoute } from "../../../routes/placementCellRoutes"; 
 import AddPlacementRecordForm from "./AddPlacementRecordForm";
 import { useSelector } from "react-redux";
 
 function PlacementRecordsTable() {
   const role = useSelector((state) => state.user.role);
 
-  // State to hold placement statistics from the API
   const [placementStats, setPlacementStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +25,6 @@ function PlacementRecordsTable() {
   const [activePage, setActivePage] = useState(1);
   const recordsPerPage = 10;
 
-  // Fetch data from the API on component load
   useEffect(() => {
     const fetchPlacementStats = async () => {
       setLoading(true);
@@ -41,7 +39,7 @@ function PlacementRecordsTable() {
 
         if (response.ok) {
           const data = await response.json();
-          setPlacementStats(data); // Store the fetched data
+          setPlacementStats(data);
         } else {
           setError(`Error fetching data: ${response.status}`);
         }
@@ -54,7 +52,6 @@ function PlacementRecordsTable() {
     fetchPlacementStats();
   }, []);
 
-  // Paginate records for the table display
   const paginatedRecords = placementStats.slice(
     (activePage - 1) * recordsPerPage,
     activePage * recordsPerPage,
@@ -135,13 +132,12 @@ function PlacementRecordsTable() {
           />
         </div>
 
-        {/* Placement Records Table */}
         <Table
           highlightOnHover
           style={{
             tableLayout: "fixed",
             width: "100%",
-            borderSpacing: "0px 0px", // Controls space between rows and columns
+            borderSpacing: "0px 0px",
           }}
         >
           <thead>
@@ -156,7 +152,6 @@ function PlacementRecordsTable() {
           <tbody>{rows}</tbody>
         </Table>
 
-        {/* Pagination */}
         <div
           style={{
             display: "flex",
