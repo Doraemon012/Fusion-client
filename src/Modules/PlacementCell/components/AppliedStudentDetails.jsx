@@ -47,11 +47,36 @@ function JobApplicationsTable() {
     );
 
     const handleStatusChange = (applicationId, status) => {
-        setApplications((prevApplications) =>
-            prevApplications.map((application) =>
-                application.id === applicationId ? { ...application, status } : application
-            )
-        );
+        const data={
+            status:status,
+        };
+        
+        const updatedata = async () =>{
+            const token = localStorage.getItem('authToken');
+            try{
+                const response = await axios.put(`http://127.0.0.1:8000/placement/api/student-applications/${applicationId}/`,data,{
+                    headers: {
+                        'Authorization': `Token ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                console.log('response:',response);
+                if (response.status === 200) {  
+                    setApplications((prevApplications) =>
+                        prevApplications.map((application) =>
+                            application.id === applicationId ? { ...application, status } : application
+                        )
+                    );
+                    console.log('updated');
+                } else {
+                    console.error('Failed to update');
+                }
+            }
+            catch(error){
+                console.error(error)
+            }
+        };
+        updatedata();
     };
 
     if (loading) return <Loader />;

@@ -23,7 +23,7 @@ import EditPlacementForm from "./EditPlacementForm";
 
 function PlacementScheduleCard({
   jobId,
-  companyLogo,
+  // companyLogo,
   companyName,
   location,
   position,
@@ -32,6 +32,7 @@ function PlacementScheduleCard({
   deadline,
   description,
   salary,
+  check
 }) {
   const role = useSelector((state) => state.user.role);
   const [visible, setVisible] = useState(true);
@@ -39,30 +40,39 @@ function PlacementScheduleCard({
 
   const navigate = useNavigate();
 
+  const [company, setCompany] = useState(companyName);
+  const [date, setDate] = useState(null);
+  const [datePickerOpened, setDatePickerOpened] = useState(false);
+  const [locationInput, setLocation] = useState(location);
+  const [ctc, setCtc] = useState("");
+  const [time, setTime] = useState("");
+  const [placementType, setPlacementType] = useState("");
+  const [jobRole, setRole] = useState(position);
+  const [descriptionInput, setDescription] = useState(description);
+
   const handleApplyClick = async () => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authToken"); 
     console.log("Auth Token:", token);
     console.log("Placement ID:", jobId);
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/placement/api/apply-placement/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ placementId }),
+      const response = await fetch('http://127.0.0.1:8000/placement/api/apply-placement/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({ jobId }),
+      });
       if (response.ok) {
-        console.log("Application successful");
+        console.log('Application successful');
       } else {
-        console.error("Failed to apply");
+        console.error('Failed to apply');
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
+
+
   };
 
   const handelViewClick = () => {
@@ -141,6 +151,9 @@ const handleSubmit = async () => {
   }
 };
 
+const handleTimeline = async () => {
+  navigate(`/placement-cell/timeline?jobId=${encodeURIComponent(jobId)}`);
+};
   
 
   if (!visible) return null;
@@ -154,7 +167,7 @@ const handleSubmit = async () => {
         withBorder
         style={{ width: 320, position: "relative" }}
       >
-        <Group align="flex-start">
+        {/* <Group align="flex-start">
           <Image
             src={companyLogo}
             alt={`${companyName} logo`}
@@ -163,7 +176,7 @@ const handleSubmit = async () => {
             fit="contain"
             withPlaceholder
           />
-        </Group>
+        </Group> */}
         <Text weight={700} size="lg" mt={10}>
           {companyName}
         </Text>
@@ -181,7 +194,7 @@ const handleSubmit = async () => {
           <Group spacing={5}>
             <Clock size={16} />
             <Text size="xs" color="dimmed">
-              {postedTime}
+              {deadline}
             </Text>
           </Group>
         </Group>
@@ -207,6 +220,17 @@ const handleSubmit = async () => {
           </Text>
 
           {role === "student" && (
+            check ? (
+              <Button
+              variant="light"
+              color="green"
+              size="xs"
+              onClick={handleTimeline} 
+            >
+              View
+            </Button>
+            // <ApplicationStatusTimeline />
+          ) : (
             <Button
               variant="light"
               color="blue"
@@ -215,6 +239,7 @@ const handleSubmit = async () => {
             >
               Apply Now
             </Button>
+            )
           )}
 
           {role === "placement officer" && (
@@ -254,7 +279,7 @@ const handleSubmit = async () => {
       <EditPlacementForm
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        placementData={{ companyLogo, companyName, location, position, jobType, postedTime, description, salary }}
+        placementData={{ companyName, location, position, jobType, deadline, description, salary }}
         onSubmit={handleSubmit}
       />
 
@@ -262,7 +287,7 @@ const handleSubmit = async () => {
   );
 }
 PlacementScheduleCard.propTypes = {
-  companyLogo: PropTypes.string,
+  // companyLogo: PropTypes.string,
   companyName: PropTypes.string.isRequired,
   location: PropTypes.string.isRequired,
   position: PropTypes.string.isRequired,

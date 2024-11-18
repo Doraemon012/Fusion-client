@@ -1,34 +1,64 @@
 import React, { useState } from "react";
 import { Modal, Button, TextInput, Select, Textarea, Card, Container } from "@mantine/core";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 function CreateNextRoundForm() {
   const [modalOpened, setModalOpened] = useState(false);
-  const [roundName, setRoundName] = useState("");
+  const [roundNumber, setRoundNumber] = useState();
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [roundType, setRoundType] = useState("");
 
+  const loc = useLocation();
+  const searchParams = new URLSearchParams(loc.search);
+  const jobId = searchParams.get("jobId");
+  
   const handleSubmit = () => {
     const nextRoundDetails = {
-      roundName,
-      date,
-      time,
-      location,
-      description,
-      roundType,
+      round_no:roundNumber,
+      test_date:date,
+      // time:time,
+      // location:location,
+      description:description,
+      test_type:roundType,
     };
 
     console.log("Next Round Details:", nextRoundDetails);
     setModalOpened(false);
     // Reset form fields
-    setRoundName("");
+    setRoundNumber();
     setDate("");
     setTime("");
     setLocation("");
     setDescription("");
     setRoundType("");
+
+    const submitFunc = async () => {
+      const token = localStorage.getItem("authToken");
+      console.log(jobId);
+      try{
+          const response = await axios.post(`http://127.0.0.1:8000/placement/api/nextround/${jobId}/`,nextRoundDetails,{
+            headers:{
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+            }
+          });
+          if(response.status===201){
+            window.alert('succesfully posted');
+          }
+          else{
+            console.error('failed to post');
+          }
+      }
+      catch(error){
+        console.error(error)
+      }
+    };
+    submitFunc();
+  
   };
 
   return (
@@ -42,10 +72,11 @@ function CreateNextRoundForm() {
         <Card shadow="sm" padding="md" radius="md">
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             <TextInput
-              label="Round Name"
-              placeholder="Enter round name"
-              value={roundName}
-              onChange={(e) => setRoundName(e.target.value)}
+              label="Round Number"
+              placeholder="Enter round number"
+              type="number" 
+              value={roundNumber}
+              onChange={(e) => setRoundNumber(e.target.value)}
               required
             />
             <TextInput
@@ -55,7 +86,7 @@ function CreateNextRoundForm() {
               onChange={(e) => setDate(e.target.value)}
               required
             />
-            <TextInput
+            {/* <TextInput
               label="Time"
               placeholder="HH:MM (24-hour format)"
               value={time}
@@ -68,7 +99,7 @@ function CreateNextRoundForm() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               required
-            />
+            /> */}
             <Textarea
               label="Description"
               placeholder="Enter a brief description"

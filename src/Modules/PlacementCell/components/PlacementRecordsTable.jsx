@@ -31,9 +31,13 @@ function PlacementRecordsTable() {
     const fetchPlacementStats = async () => {
       setLoading(true);
       try {
+        const token = localStorage.getItem('authToken');
         const response = await fetch(
-          "http://127.0.0.1:8000/placement/api/statistics/",
-        );
+          "http://127.0.0.1:8000/placement/api/statistics/",{
+          headers:{
+              'Authorization': `Token ${token}`,
+          }
+      });
 
         if (response.ok) {
           const data = await response.json();
