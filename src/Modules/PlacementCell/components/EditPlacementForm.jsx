@@ -1,3 +1,4 @@
+import "@mantine/dates/styles.css";
 import React, { useState } from "react";
 import {
   Modal,
@@ -10,7 +11,7 @@ import {
   Group,
   Button,
 } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DateInput, DatePicker } from "@mantine/dates";
 import { TimeInput } from "@mantine/dates";
 import PropTypes from "prop-types";
 
@@ -31,7 +32,7 @@ const EditPlacementForm = ({ isOpen, onClose, placementData, onSubmit }) => {
   const [date, setDate] = useState(); // Initially null
   const [locationInput, setLocation] = useState(location);
   const [ctc, setCtc] = useState(salary);
-  const [time, setTime] = useState();
+  const [time, setTime] = useState(new Date());
   const [placementType, setPlacementType] = useState(jobType);
   const [descriptionInput, setDescription] = useState(description);
   const [role, setRole] = useState();
@@ -87,11 +88,38 @@ const EditPlacementForm = ({ isOpen, onClose, placementData, onSubmit }) => {
 
           {/* Date Picker */}
           <Grid.Col span={4}>
-            <DateInput
+           <DateInput
               label="Date"
               placeholder="Pick a date"
               value={date}
-              onChange={(value) => setDate(value)} // Directly update state
+              onChange={(d) => {
+                setDate(d);
+                console.log(d, date);
+              }}
+              opened={datePickerOpened}
+              onFocus={() => setDatePickerOpened(true)}
+              onBlur={() => setDatePickerOpened(false)}
+              styles={{
+                input: {
+                  border: "1px solid #ced4da",
+                  borderRadius: "4px",
+                  padding: "10px",
+                  fontSize: "14px",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  "&:focus": {
+                    outline: "none",
+                    borderColor: "#1c7ed6",
+                  },
+                },
+                label: {
+                  display: "block",
+                  marginBottom: "5px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: "#425047",
+                },
+              }}
             />
           </Grid.Col>
 
@@ -136,6 +164,7 @@ const EditPlacementForm = ({ isOpen, onClose, placementData, onSubmit }) => {
 
           <Grid.Col span={12}>
             <Textarea
+              resize="vertical"
               label="Description"
               placeholder="Enter a description"
               value={descriptionInput}
