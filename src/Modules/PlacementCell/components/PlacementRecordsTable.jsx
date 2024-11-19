@@ -19,7 +19,6 @@ import axios from "axios";
 function PlacementRecordsTable() {
   const role = useSelector((state) => state.user.role);
 
-  
   const [placementStats, setPlacementStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +26,6 @@ function PlacementRecordsTable() {
   const [activePage, setActivePage] = useState(1);
   const recordsPerPage = 10;
 
-  
   useEffect(() => {
     const fetchPlacementStats = async () => {
       setLoading(true);
@@ -39,7 +37,12 @@ function PlacementRecordsTable() {
           },
         });
 
-        setPlacementStats(response.data);
+        if (response.ok) {
+          const data = await response.json();
+          setPlacementStats(data);
+        } else {
+          setError(`Error fetching data: ${response.status}`);
+        }
       } catch (error) {
         setError("Failed to fetch placement statistics");
       } finally {
@@ -109,8 +112,51 @@ function PlacementRecordsTable() {
         )}
       </Container>
 
-      <Card shadow="sm" padding="md" radius="md" withBorder>
-        <Table>
+      <Card
+        shadow="sm"
+        padding="md"
+        radius="md"
+        withBorder
+        style={{ width: "900px" }}
+      >
+        {/* Title */}
+        <Title order={3} style={{ marginBottom: "12px", fontSize: "18px" }}>
+          All Students
+        </Title>
+
+        {/* Table Search and Sorting Options */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "12px",
+            gap: "8px",
+          }}
+        >
+          <TextInput
+            placeholder="Search"
+            icon="🔍"
+            style={{ width: "180px", fontSize: "14px" }}
+          />
+          <Select
+            placeholder="Sort by"
+            data={[
+              { value: "newest", label: "Newest" },
+              { value: "highest_ctc", label: "Highest CTC" },
+              { value: "lowest_ctc", label: "Lowest CTC" },
+            ]}
+            style={{ width: "180px", fontSize: "14px" }}
+          />
+        </div>
+
+        <Table
+          highlightOnHover
+          style={{
+            tableLayout: "fixed",
+            width: "100%",
+            borderSpacing: "0px 0px",
+          }}
+        >
           <thead>
             <tr>
               <th>Student Name</th>
@@ -123,7 +169,6 @@ function PlacementRecordsTable() {
           <tbody>{rows}</tbody>
         </Table>
 
-        {/* Pagination */}
         <div
           style={{
             display: "flex",

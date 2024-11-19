@@ -29,21 +29,19 @@ function AddPlacementEventForm() {
   const [resumeFile, setResumeFile] = useState(null);
   const [datePickerOpened, setDatePickerOpened] = useState(false);
 
-  // Function to get the current time in HH:mm:ss format
   const getCurrentTime = () => {
     const now = new Date();
     return now.toLocaleTimeString("en-GB", { hour12: false });
   };
 
-  // Set the default time to the current time
   useEffect(() => {
     setTime(getCurrentTime());
   }, []);
 
   const handleSubmit = async () => {
-    console.log("Submitting form"); // Debugging log
+    console.log("Submitting form");
 
-    const token = localStorage.getItem("authToken"); // Retrieve token from localStorage
+    const token = localStorage.getItem("authToken"); 
     if (!token) {
       notifications.show({
         title: "Unauthorized",
