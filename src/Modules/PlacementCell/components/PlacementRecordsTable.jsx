@@ -11,14 +11,15 @@ import {
   Loader,
   Alert,
 } from "@mantine/core";
-import { statisticsRoute } from "../../../routes/placementCellRoutes"; // Ensure this points to your actual API route
+import { statisticsRoute } from "../../../routes/placementCellRoutes"; 
 import AddPlacementRecordForm from "./AddPlacementRecordForm";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 function PlacementRecordsTable() {
   const role = useSelector((state) => state.user.role);
 
-  // State to hold placement statistics from the API
+  
   const [placementStats, setPlacementStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,25 +27,19 @@ function PlacementRecordsTable() {
   const [activePage, setActivePage] = useState(1);
   const recordsPerPage = 10;
 
-  // Fetch data from the API on component load
+  
   useEffect(() => {
     const fetchPlacementStats = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(
-          "http://127.0.0.1:8000/placement/api/statistics/",{
-          headers:{
-              'Authorization': `Token ${token}`,
-          }
-      });
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("http://127.0.0.1:8000/placement/api/statistics/", {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
 
-        if (response.ok) {
-          const data = await response.json();
-          setPlacementStats(data); // Store the fetched data
-        } else {
-          setError(`Error fetching data: ${response.status}`);
-        }
+        setPlacementStats(response.data);
       } catch (error) {
         setError("Failed to fetch placement statistics");
       } finally {
@@ -54,23 +49,39 @@ function PlacementRecordsTable() {
     fetchPlacementStats();
   }, []);
 
-  // Paginate records for the table display
+  const downloadExcel = async () => {
+    const token = localStorage.getItem("authToken");
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/placement/api/download-statistics/", {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+        responseType: "blob", 
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "placement_statistics.xlsx");
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Error downloading Excel file:", error);
+    }
+  };
+
   const paginatedRecords = placementStats.slice(
     (activePage - 1) * recordsPerPage,
-    activePage * recordsPerPage,
+    activePage * recordsPerPage
   );
 
   const rows = paginatedRecords.map((record, index) => (
     <tr key={index}>
-      <td style={{ padding: "4px", whiteSpace: "nowrap" }}>
-        {record.first_name}
-      </td>
-      <td style={{ padding: "4px", whiteSpace: "nowrap" }}>
-        {record.placement_name}
-      </td>
-      <td style={{ padding: "4px", whiteSpace: "nowrap" }}>{record.batch}</td>
-      <td style={{ padding: "4px", whiteSpace: "nowrap" }}>{record.branch}</td>
-      <td style={{ padding: "4px", whiteSpace: "nowrap" }}>{record.ctc}</td>
+      <td>{record.first_name}</td>
+      <td>{record.placement_name}</td>
+      <td>{record.batch}</td>
+      <td>{record.branch}</td>
+      <td>{record.ctc}</td>
     </tr>
   ));
 
@@ -78,7 +89,7 @@ function PlacementRecordsTable() {
   if (error) return <Alert color="red">{error}</Alert>;
 
   return (
-    <Container fluid>
+    <Container>
       <Container
         fluid
         style={{
@@ -89,68 +100,24 @@ function PlacementRecordsTable() {
         }}
         my={16}
       >
-        <Title order={2}>Placement Statisticts</Title>
-
+        <Title order={2}>Placement Statistics</Title>
         {role === "placement officer" && (
-          <Button onClick={() => setModalOpened(true)}>
-            Add Placement Record
-          </Button>
+          <>
+          <Button onClick={downloadExcel}>Download Excel</Button>
+          <Button onClick={() => setModalOpened(true)}>Add Placement Record</Button>
+        </>
         )}
       </Container>
 
-      <Card
-        shadow="sm"
-        padding="md"
-        radius="md"
-        withBorder
-        style={{ width: "900px" }}
-      >
-        {/* Title */}
-        <Title order={3} style={{ marginBottom: "12px", fontSize: "18px" }}>
-          All Students
-        </Title>
-
-        {/* Table Search and Sorting Options */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "12px",
-            gap: "8px",
-          }}
-        >
-          <TextInput
-            placeholder="Search"
-            icon="🔍"
-            style={{ width: "180px", fontSize: "14px" }}
-          />
-          <Select
-            placeholder="Sort by"
-            data={[
-              { value: "newest", label: "Newest" },
-              { value: "highest_ctc", label: "Highest CTC" },
-              { value: "lowest_ctc", label: "Lowest CTC" },
-            ]}
-            style={{ width: "180px", fontSize: "14px" }}
-          />
-        </div>
-
-        {/* Placement Records Table */}
-        <Table
-          highlightOnHover
-          style={{
-            tableLayout: "fixed",
-            width: "100%",
-            borderSpacing: "0px 0px", // Controls space between rows and columns
-          }}
-        >
+      <Card shadow="sm" padding="md" radius="md" withBorder>
+        <Table>
           <thead>
             <tr>
-              <th style={{ width: "30%" }}>Student Name</th>
-              <th style={{ width: "30%" }}>Company</th>
-              <th style={{ width: "12%" }}>Batch</th>
-              <th style={{ width: "12%" }}>Branch</th>
-              <th style={{ width: "12%" }}>CTC</th>
+              <th>Student Name</th>
+              <th>Company</th>
+              <th>Batch</th>
+              <th>Branch</th>
+              <th>CTC</th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>

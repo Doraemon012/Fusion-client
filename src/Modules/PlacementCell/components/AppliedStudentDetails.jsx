@@ -1,97 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { Table, Pagination, Select, Card, Title, Container, Button, Loader, Alert, TextInput } from "@mantine/core";
-import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
-import axios from "axios";  // Correctly import Axios
+import axios from "axios";
 
 function JobApplicationsTable() {
-    const role = useSelector((state) => state.user.role);
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const jobId = searchParams.get("jobId");
-
-    // Sample data for job applications
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [activePage, setActivePage] = useState(1);
     const recordsPerPage = 10;
 
+    const jobId = new URLSearchParams(window.location.search).get("jobId");
+
     useEffect(() => {
-        const fetchAppliedStudents = async () => {
+        const fetchApplications = async () => {
             const token = localStorage.getItem("authToken");
-            console.log(jobId);
-            
             try {
                 const response = await axios.get(`http://127.0.0.1:8000/placement/api/student-applications/${jobId}/`, {
-                    headers: {
-                        'Authorization': `Token ${token}`,
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { Authorization: `Token ${token}` },
                 });
-                if (response.status === 200) {  
-                    setApplications(response.data.students);
-                } else {
-                    console.error('Failed to fetch');
-                }
+                setApplications(response.data.students);
             } catch (error) {
-                console.error('Error:', error);
+                console.error("Error fetching applications:", error);
             }
         };
-        fetchAppliedStudents();
+        fetchApplications();
     }, [jobId]);
+
+    const downloadExcel = async () => {
+        const token = localStorage.getItem("authToken");
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/placement/api/download-applications/${jobId}/`, {
+                headers: { Authorization: `Token ${token}` },
+                responseType: "blob",
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `applications_${jobId}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+        } catch (error) {
+            console.error("Error downloading Excel:", error);
+        }
+    };
 
     const paginatedApplications = applications.slice(
         (activePage - 1) * recordsPerPage,
         activePage * recordsPerPage
     );
 
-    const handleStatusChange = (applicationId, status) => {
-        const data={
-            status:status,
-        };
-        
-        const updatedata = async () =>{
-            const token = localStorage.getItem('authToken');
-            try{
-                const response = await axios.put(`http://127.0.0.1:8000/placement/api/student-applications/${applicationId}/`,data,{
-                    headers: {
-                        'Authorization': `Token ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-                console.log('response:',response);
-                if (response.status === 200) {  
-                    setApplications((prevApplications) =>
-                        prevApplications.map((application) =>
-                            application.id === applicationId ? { ...application, status } : application
-                        )
-                    );
-                    console.log('updated');
-                } else {
-                    console.error('Failed to update');
-                }
-            }
-            catch(error){
-                console.error(error)
-            }
-        };
-        updatedata();
-    };
-
-    if (loading) return <Loader />;
-    if (error) return <Alert color="red">{error}</Alert>;
-
     return (
         <Container>
             <Card shadow="sm" padding="md" radius="md" withBorder>
-                <Title order={3} style={{ marginBottom: '12px' }}>Student Job Applications</Title>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px', gap: '20px' }}>
-                    <TextInput
-                        placeholder="Search"
-                        icon="🔍"
-                        style={{ width: '180px', fontSize: '14px' }}
-                    />
+                <Title order={3}>Student Job Applications</Title>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+                    <TextInput placeholder="Search" style={{ width: "200px" }} />
+                    <Button onClick={downloadExcel}>Download Excel</Button>
                 </div>
                 <Table highlightOnHover>
                     <thead>
@@ -106,31 +70,30 @@ function JobApplicationsTable() {
                     <tbody>
                         {paginatedApplications.map((application) => (
                             <tr key={application.id}>
-                                <td style={{ padding: '20px' }}>{application.name}</td>
-                                <td style={{ padding: '20px' }}>{application.roll_no}</td>
-                                <td style={{ padding: '20px' }}>{application.email}</td>
-                                <td style={{ padding: '20px' }}>{application.cpi}</td>
-                                <td style={{ padding: '20px' }}>
+                                <td>{application.name}</td>
+                                <td>{application.roll_no}</td>
+                                <td>{application.email}</td>
+                                <td>{application.cpi}</td>
+                                <td>
                                     <Select
                                         data={[
-                                            { value: 'accept', label: 'Accept' },
-                                            { value: 'reject', label: 'Reject' },
+                                            { value: "accept", label: "Accept" },
+                                            { value: "reject", label: "Reject" },
                                         ]}
-                                        placeholder="Select"
                                         value={application.status}
-                                        onChange={(value) => handleStatusChange(application.id, value)}
+                                        onChange={(value) =>
+                                            handleStatusChange(application.id, value)
+                                        }
                                     />
                                 </td>
                             </tr>
                         ))}
                     </tbody>
-
                 </Table>
                 <Pagination
                     total={Math.ceil(applications.length / recordsPerPage)}
                     page={activePage}
                     onChange={setActivePage}
-                    style={{ marginTop: '12px' }}
                 />
             </Card>
         </Container>
