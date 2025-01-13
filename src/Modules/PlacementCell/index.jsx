@@ -1,4 +1,8 @@
 import "@mantine/notifications/styles.css";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "mantine-react-table/styles.css";
+
 import React, { useState, useRef } from "react";
 import { Tabs, Button, Container } from "@mantine/core";
 import { useSelector } from "react-redux";

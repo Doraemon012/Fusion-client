@@ -179,6 +179,11 @@ import {
 import axios from "axios";
 import { MantineReactTable } from "mantine-react-table";
 import { notifications } from "@mantine/notifications";
+import {
+  downloadExcelRoute,
+  fetchApplicationsRoute,
+  handleStatusChangeRoute,
+} from "../../../routes/placementCellRoutes";
 
 function JobApplicationsTable() {
   const [applications, setApplications] = useState([]);
@@ -193,12 +198,9 @@ function JobApplicationsTable() {
       const token = localStorage.getItem("authToken");
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://127.0.0.1:8000/placement/api/student-applications/${jobId}/`,
-          {
-            headers: { Authorization: `Token ${token}` },
-          },
-        );
+        const response = await axios.get(`${fetchApplicationsRoute}${jobId}/`, {
+          headers: { Authorization: `Token ${token}` },
+        });
         setApplications(response.data.students);
       } catch (error) {
         console.error("Error fetching applications:", error);
@@ -215,7 +217,7 @@ function JobApplicationsTable() {
       const token = localStorage.getItem("authToken");
       try {
         const response = await axios.put(
-          `http://127.0.0.1:8000/placement/api/student-applications/${applicationId}/`,
+          `${handleStatusChangeRoute}${applicationId}/`,
           data,
           {
             headers: {
@@ -264,13 +266,10 @@ function JobApplicationsTable() {
   const downloadExcel = async () => {
     const token = localStorage.getItem("authToken");
     try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000/placement/api/download-applications/${jobId}/`,
-        {
-          headers: { Authorization: `Token ${token}` },
-          responseType: "blob",
-        },
-      );
+      const response = await axios.get(`${downloadExcelRoute}${jobId}/`, {
+        headers: { Authorization: `Token ${token}` },
+        responseType: "blob",
+      });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -348,29 +347,32 @@ function JobApplicationsTable() {
 
   return (
     <Container fluid>
-      <Card padding="md" radius="md" withBorder>
-        <Title order={3}>Student Job Applications</Title>
-        <div
+      <Container padding="md" fluid>
+        <Container
+          fluid
           style={{
             display: "flex",
+            alignItems: "center",
             justifyContent: "space-between",
-            marginBottom: "12px",
           }}
+          my={36}
         >
+          <Title order={3}>Student Job Applications</Title>
+
           <Button onClick={downloadExcel}>Download Excel</Button>
-        </div>
+        </Container>
 
         {applications.length > 0 ? (
           <MantineReactTable
             columns={columns}
             data={paginatedApplications}
-            enableColumnOrdering
-            enableGlobalFilter
+            // enableColumnOrdering
+            // enableGlobalFilter
           />
         ) : (
           <Alert color="yellow">No applications available</Alert>
         )}
-      </Card>
+      </Container>
     </Container>
   );
 }

@@ -248,6 +248,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import AddPlacementEventForm from "./AddPlacementEventForm";
 import PlacementScheduleCard from "./PlacementScheduleCard";
+import { fetchPlacementScheduleRoute } from "../../../routes/placementCellRoutes";
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -272,10 +273,10 @@ function PlacementScheduleGrid({ data, itemsPerPage, cardsPerRow }) {
   Array.from({ length: remainingCards }).forEach(() => paddedItems.push(null));
 
   return (
-    <Container fluid >
+    <Container fluid>
       <Grid gutter="md">
         {paddedItems.map((item, index) => (
-          <Grid.Col key={index} span={12 / cardsPerRow}>
+          <Grid.Col key={index} span={'content'}>
             {item ? (
               <PlacementScheduleCard
                 jobId={item.id}
@@ -325,7 +326,7 @@ function PlacementSchedule() {
       const token = localStorage.getItem("authToken");
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/placement/api/placement/",
+          fetchPlacementScheduleRoute,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -388,7 +389,7 @@ function PlacementSchedule() {
         <Tabs defaultValue="active" variant="pills" style={{ marginLeft: 16 }}>
           <Tabs.List>
             <Tabs.Tab value="active">Active</Tabs.Tab>
-            <Tabs.Tab value="closed">Closed</Tabs.Tab>
+            {role != "student" && <Tabs.Tab value="closed">Closed</Tabs.Tab>}
           </Tabs.List>
 
           <Tabs.Panel value="active" pt="md">
@@ -424,58 +425,58 @@ function PlacementSchedule() {
 
 export default PlacementSchedule;
 
-// import { useState } from 'react';
-// import { Grid, Pagination, Container } from '@mantine/core';
+// // import { useState } from 'react';
+// // import { Grid, Pagination, Container } from '@mantine/core';
 
-// // Example data
-// const items = Array.from({ length: 20 }, (_, i) => `Item ${i + 1}`);
+// // // Example data
+// // const items = Array.from({ length: 20 }, (_, i) => `Item ${i + 1}`);
 
-// const PlacementSchedule = () => {
-//   const [activePage, setActivePage] = useState(1);
-//   const itemsPerPage = 8; // Two rows of 4 items each
+// // const PlacementSchedule = () => {
+// //   const [activePage, setActivePage] = useState(1);
+// //   const itemsPerPage = 8; // Two rows of 4 items each
 
-//   // Calculate visible items for the current page
-//   const startIdx = (activePage - 1) * itemsPerPage;
-//   const visibleItems = items.slice(startIdx, startIdx + itemsPerPage);
+// //   // Calculate visible items for the current page
+// //   const startIdx = (activePage - 1) * itemsPerPage;
+// //   const visibleItems = items.slice(startIdx, startIdx + itemsPerPage);
 
-//   return (
-//     <Container fluid>
-//       <Grid gutter="md">
-//         {visibleItems.map((item, index) => (
-//           <Grid.Col
-//             key={index}
-//             span={{
-//               sm:6 ,// 2 items per row on small screens
-//               md:4, // 3 items per row on medium screens
-//               lg:3 // 4 items per row on large screens
+// //   return (
+// //     <Container fluid>
+// //       <Grid gutter="md">
+// //         {visibleItems.map((item, index) => (
+// //           <Grid.Col
+// //             key={index}
+// //             span={{
+// //               sm:6 ,// 2 items per row on small screens
+// //               md:4, // 3 items per row on medium screens
+// //               lg:3 // 4 items per row on large screens
 
-//             }}
+// //             }}
 
-//           >
-//             <div
-//               style={{
-//                 padding: '16px',
-//                 border: '1px solid #ddd',
-//                 borderRadius: '8px',
-//                 textAlign: 'center',
-//                 backgroundColor: '#f9f9f9',
-//               }}
-//             >
-//               {item}
-//             </div>
-//           </Grid.Col>
-//         ))}
-//       </Grid>
+// //           >
+// //             <div
+// //               style={{
+// //                 padding: '16px',
+// //                 border: '1px solid #ddd',
+// //                 borderRadius: '8px',
+// //                 textAlign: 'center',
+// //                 backgroundColor: '#f9f9f9',
+// //               }}
+// //             >
+// //               {item}
+// //             </div>
+// //           </Grid.Col>
+// //         ))}
+// //       </Grid>
 
-//       <Pagination
-//         total={Math.ceil(items.length / itemsPerPage)}
-//         value={activePage}
-//         onChange={setActivePage}
-//         mt="lg"
-//         position="center"
-//       />
-//     </Container>
-//   );
-// };
+// //       <Pagination
+// //         total={Math.ceil(items.length / itemsPerPage)}
+// //         value={activePage}
+// //         onChange={setActivePage}
+// //         mt="lg"
+// //         position="center"
+// //       />
+// //     </Container>
+// //   );
+// // };
 
-// export default PlacementSchedule;
+// // export default PlacementSchedule;

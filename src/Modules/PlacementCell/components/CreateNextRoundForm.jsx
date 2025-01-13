@@ -9,8 +9,10 @@ import {
   Textarea,
   Card,
   Container,
+  Title,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { submitNextRoundDetailsRoute } from "../../../routes/placementCellRoutes";
 
 function CreateNextRoundForm() {
   const [modalOpened, setModalOpened] = useState(false);
@@ -50,7 +52,7 @@ function CreateNextRoundForm() {
       console.log(jobId);
       try {
         const response = await axios.post(
-          `http://127.0.0.1:8000/placement/api/nextround/${jobId}/`,
+          `${submitNextRoundDetailsRoute}${jobId}/`,
           nextRoundDetails,
           {
             headers: {
@@ -90,14 +92,16 @@ function CreateNextRoundForm() {
   };
 
   return (
-    <Container>
+    <Container fluid style={{display:'flex', alignContent:'flex-end'}}>
       <Button onClick={() => setModalOpened(true)}>Create Next Round</Button>
       <Modal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        title="Add Next Round Details"
+        centered
       >
-        <Card shadow="sm" padding="md" radius="md">
+        <Container d>
+
+          <Title order={3} mb={32}>Add next round details</Title>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -156,7 +160,7 @@ function CreateNextRoundForm() {
               Save Round Details
             </Button>
           </form>
-        </Card>
+        </Container>
       </Modal>
     </Container>
   );
