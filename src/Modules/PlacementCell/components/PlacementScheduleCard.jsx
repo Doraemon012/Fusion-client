@@ -5,7 +5,7 @@ import {
   Badge,
   Group,
   Button,
-  Image,
+  // Image,
   ActionIcon,
   Title,
 } from "@mantine/core";
@@ -14,20 +14,22 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { format } from "date-fns";
-import EditPlacementForm from "./EditPlacementForm";
 import { notifications } from "@mantine/notifications";
+import EditPlacementForm from "./EditPlacementForm";
 
 function PlacementScheduleCard({
   jobId,
-  companyLogo,
+  // companyLogo,
   companyName,
   location,
   position,
   jobType,
   postedTime,
   deadline,
+  endDateTime,
   description,
   salary,
+  eligibilityCriteria,
   check,
 }) {
   const role = useSelector((state) => state.user.role);
@@ -121,19 +123,21 @@ function PlacementScheduleCard({
     console.log(newData);
     const token = localStorage.getItem("authToken");
 
-    const formattedDate = newData.date && format(newData.date, "yyyy-MM-dd");
+    // const formattedDate = newData.date && format(newData.date, "yyyy-MM-dd");
 
-    const formattedTime = newData.time && format(newData.time, "HH:mm:ss");
+    // const formattedTime = newData.time && format(newData.time, "HH:mm:ss");
 
     const updatedData = {
       placement_type: newData.placementType,
       company_name: newData.company || companyName,
       ctc: newData.ctc || salary,
       description: newData.descriptionInput || description,
-      schedule_at: formattedTime,
-      placement_date: formattedDate,
+      schedule_at: format(newData.time, "HH:mm:ss"),
+      placement_date: format(newData.date, "yyyy-MM-dd"),
+      end_date_time: format(newData.endDateTime, "yyyy-MM-dd HH:mm:ss"),
+      eligibility_criteria: newData.eligibilityCriteria || eligibilityCriteria,
       location: newData.locationInput || location,
-      role: newData.role || (position && position.toString()),
+      role: newData.role || position,
     };
 
     try {
@@ -230,6 +234,21 @@ function PlacementScheduleCard({
             </Text>
           </Group>
         </Group>
+
+        {/* Display End Date & Time */}
+        <Group mt="xs" spacing={5}>
+          <Clock size={16} />
+          <Text size="sm" color="dimmed">
+            <strong>End:</strong> {endDateTime}
+          </Text>
+        </Group>
+
+        {/* Display Eligibility Criteria */}
+        <Text size="sm" mt="sm" color="dimmed">
+          <strong>Eligibility:</strong>{" "}
+          {eligibilityCriteria?.join(", ") || "None specified"}
+        </Text>
+
         <Text
           size="sm"
           mt="sm"
@@ -250,7 +269,6 @@ function PlacementScheduleCard({
           <Text size="xl" weight={700} color="blue">
             {salary}
           </Text>
-
 
           {role === "student" &&
             (check ? (
@@ -311,29 +329,46 @@ function PlacementScheduleCard({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         placementData={{
-          companyLogo,
           companyName,
           location,
           position,
           jobType,
           postedTime,
+          deadline,
+          endDateTime,
           description,
           salary,
+          eligibilityCriteria,
         }}
         onSubmit={(newData) => handleSubmit(newData)}
       />
     </>
   );
 }
+// PlacementScheduleCard.propTypes = {
+//   // companyLogo: PropTypes.string,
+//   companyName: PropTypes.string.isRequired,
+//   location: PropTypes.string.isRequired,
+//   position: PropTypes.string.isRequired,
+//   jobType: PropTypes.string.isRequired,
+//   postedTime: PropTypes.string.isRequired,
+//   // deadline: PropTypes.string,
+//   description: PropTypes.string,
+//   salary: PropTypes.string,
+// };
 PlacementScheduleCard.propTypes = {
-  // companyLogo: PropTypes.string,
+  jobId: PropTypes.string.isRequired, // Add this line to validate jobId
   companyName: PropTypes.string.isRequired,
   location: PropTypes.string.isRequired,
   position: PropTypes.string.isRequired,
   jobType: PropTypes.string.isRequired,
   postedTime: PropTypes.string.isRequired,
-  // deadline: PropTypes.string,
+  deadline: PropTypes.string,
+  endDateTime: PropTypes.string,
   description: PropTypes.string,
   salary: PropTypes.string,
+  eligibilityCriteria: PropTypes.arrayOf(PropTypes.string),
+  check: PropTypes.bool,
 };
+
 export default PlacementScheduleCard;
