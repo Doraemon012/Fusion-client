@@ -15,6 +15,7 @@ import DownloadCV from "./components/DownloadCV";
 import CustomBreadcrumbs from "../../components/Breadcrumbs";
 import CompanyRegistrationForm from "./components/CompanyRegistrationForm";
 import FieldsForm from "./components/FieldsForm";
+import DebarredStudents from "./components/DebarredStudents";
 
 const studentTabs = [
   {
@@ -51,6 +52,11 @@ const chairmanTabs = [
     label: "Placement Calendar",
     component: <PlacementCalendar />,
   },
+  {
+    value: "debarred-students",
+    label: "Debarred Students",
+    component: <DebarredStudents />,
+  }
 ];
 
 const tpoTabs = [
@@ -84,6 +90,10 @@ const tpoTabs = [
     label: "Fields",
     component: <FieldsForm />, // Add this tab
   },
+    value: "debarred-students",
+    label: "Debarred Students",
+    component: <DebarredStudents />,
+  }
 ];
 
 const styles = {
