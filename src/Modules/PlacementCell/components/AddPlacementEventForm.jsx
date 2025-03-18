@@ -600,6 +600,7 @@ function AddPlacementEventForm() {
     // console.log(companies);
     const companyId = getCompanyId(selectedCompany);
     // console.log(companyId);
+
     const matchingIds = selectedFields.map(value => {
       const field = tpoFields.find(field => field.value === value);
       return field ? field.id : null; 
