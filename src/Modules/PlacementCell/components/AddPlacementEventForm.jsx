@@ -51,34 +51,59 @@ function AddPlacementEventForm() {
   const [selectedCompany, setSelectedCompany] = useState(null);
 
   // sample dta for companies
-  const [companies] = useState([
-    {
-      id: 1,
-      companyName: "Company A",
-      description: "Description A",
-      address: "Address A",
-      website: "www.companya.com",
-    },
-    {
-      id: 2,
-      companyName: "Company B",
-      description: "Description B",
-      address: "Address B",
-      website: "www.companyb.com",
-    },
-    {
-      id: 3,
-      companyName: "Company C",
-      description: "Description C",
-      address: "Address C",
-      website: "www.companyc.com",
-    },
-  ]);
+  const [companies, setCompanies] = useState([]);
 
   const getCurrentTime = () => {
     const now = new Date();
     return now.toLocaleTimeString("en-GB", { hour12: false });
   };
+
+  const getCompanyId = (companyName) => {
+    const company = companies.find(c => c.companyName === companyName);
+    return company ? company.id : null; 
+  };
+  
+  useEffect(() => {
+      const fetchRegistrationData = async () => {
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await axios.get(fetchRegistrationRoute, {
+            headers: { Authorization: `Token ${token}` },
+          });
+    
+          if (response.status !== 200) {
+            notifications.show({
+              title: "Error fetching data",
+              message: `Error fetching data: ${response.status}`,
+              color: "red",
+            });
+          }
+          else{
+            const uniqueCompanies = [];
+          const companyNames = new Set();
+
+          response.data.forEach((comp) => {
+            if (!companyNames.has(comp.companyName)) {
+              companyNames.add(comp.companyName);
+              uniqueCompanies.push(comp);
+            }
+          });
+
+          setCompanies(uniqueCompanies);
+          }
+    
+        } catch (error) {
+          notifications.show({
+            title: "Failed to fetch data",
+            message: "Failed to fetch companies list",
+            color: "red",
+          });
+          console.error(error);
+        }
+      };
+      fetchRegistrationData();
+    }, []);
+
 
   useEffect(() => {
     setTime(getCurrentTime());
@@ -98,10 +123,13 @@ function AddPlacementEventForm() {
       });
       return;
     }
-
+    // console.log(companies);
+    const companyId = getCompanyId(selectedCompany);
+    // console.log(companyId);
     const formData = new FormData();
     formData.append("placement_type", placementType);
-    // formData.append("company_name", company);
+    formData.append("company_name", selectedCompany);
+    formData.append("company_id",companyId);
     formData.append("ctc", ctc);
     formData.append("description", description);
     formData.append("title", company);
