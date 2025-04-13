@@ -445,6 +445,31 @@ function PlacementRecordsTable() {
     fetchPlacementStats();
   }, []);
 
+
+  const downloadExcel = async () => {
+        const token = localStorage.getItem("authToken");
+        console.log("enteres");
+        try {
+          const response = await axios.get(
+            "http://127.0.0.1:8000/placement/api/download-statistics/",
+            {
+              headers: {
+                Authorization: `Token ${token}`,
+              },
+              responseType: "blob",
+            },
+          );
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "placement_statistics.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        } catch (error) {
+          console.error("Error downloading Excel file:", error);
+        }
+      };
+
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete this record id:${id}?`,
@@ -575,7 +600,7 @@ function PlacementRecordsTable() {
       <AddPlacementRecordForm
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-      />
+      /><Button onClick={()=>{downloadExcel()}}> Doen;oad Excel </Button>
 
       <Container fluid>
         <Title order={3} style={{ marginBottom: "12px" }}>

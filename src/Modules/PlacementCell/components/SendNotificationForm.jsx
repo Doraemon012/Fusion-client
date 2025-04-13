@@ -94,11 +94,6 @@ function SendNotificationForm() {
           value={formData.date}
           onChange={(date) => handleChange("date", date)}
         />
-        <TimeInput
-          label="Time"
-          value={formData.time}
-          onChange={(time) => handleChange("time", time)}
-        />
       </Group>
 
       <TextInput
