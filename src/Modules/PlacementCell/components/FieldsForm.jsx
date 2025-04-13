@@ -159,6 +159,7 @@ function FieldsForm() {
             { value: "decimal", label: "Decimal" },
             { value: "date", label: "Date" },
             { value: "time", label: "Time" },
+            { value: "file", label: "File" },
           ]}
           required
         />

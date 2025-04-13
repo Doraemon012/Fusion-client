@@ -205,6 +205,16 @@ function ApplyToPlacementForm({ jobID,prefilledFields, additionalFields, onSubmi
                   required={field.required}
                 />
               )}
+              {field.type === "file" && (
+                <FileInput
+                  label={field.name.replace(/_/g, " ").toUpperCase()}
+                  placeholder={`Upload ${field.name}`}
+                  value={formData[field.field_id]?.value || null}
+                  onChange={(file) => handleChange(field.field_id, file)}
+                  error={errors[field.name]}
+                  required={field.required}
+                />
+              )}
             </Grid.Col>
           ))}
 
